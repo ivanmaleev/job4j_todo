@@ -11,6 +11,7 @@ public class Item {
     private String description;
     private Timestamp created;
     private boolean done;
+    private User user;
 
     public Item(int id, String description, boolean done) {
         this.id = id;
@@ -19,11 +20,12 @@ public class Item {
         this.done = done;
     }
 
-    public Item(int id, String description, Timestamp created,  boolean done) {
+    public Item(int id, String description, Timestamp created,  boolean done, User user) {
         this.id = id;
         this.description = description;
         this.created = created;
         this.done = done;
+        this.user = user;
     }
 
     public Item() {
@@ -62,5 +64,15 @@ public class Item {
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

@@ -18,6 +18,7 @@ import java.util.function.Function;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import ru.job4j.todo.model.User;
 
 public class PsqlStore implements Store {
 
@@ -82,12 +83,16 @@ public class PsqlStore implements Store {
     }
 
     @Override
-    public List<Item> findAllItems(boolean all) {
+    public List<Item> findAllItems(boolean all, int userid) {
         return query(session -> {
             if (all) {
-                return session.createQuery("from Item order by id").list();
+                Query query = session.createQuery("from Item where user = : user order by id");
+                query.setParameter("user", new User(userid));
+                return query.list();
             } else {
-                return session.createQuery("from Item where done = false order by id").list();
+                Query query = session.createQuery("from Item where user = : user and done = false order by id");
+                query.setParameter("user", new User(userid));
+                return query.list();
             }
         });
     }
@@ -108,5 +113,23 @@ public class PsqlStore implements Store {
             query.executeUpdate();
             return null;
         });
+    }
+
+    @Override
+    public User saveUser(User user) {
+        return query(session -> {
+            session.save(user);
+            return user;
+        });
+    }
+
+    @Override
+    public User findUserByEmail(String email) {
+        List<User> users = query(session -> {
+            Query query = session.createQuery("from User where email = : email");
+            query.setParameter("email", email);
+            return query.list();
+        });
+        return (users.size() == 0 ? null : users.get(0));
     }
 }

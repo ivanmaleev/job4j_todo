@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,9 +37,13 @@
                 var description = document.getElementById('description');
                 let descriptiontext = description.value;
                 description.value = '';
+                let user_id = <c:out value="${user.id}"/>;
                 $.ajax({
                     type: 'POST',
-                    data: {'description': descriptiontext},
+                    data: {
+                        'description': descriptiontext,
+                        'userid': user_id
+                    },
                     url: 'http://localhost:8080/job4j_todo/todo',
                 }).done(function () {
                     getItems();
@@ -70,9 +75,13 @@
     <script>
         function getItems() {
             var viewdone = document.getElementById('viewdone').checked;
+            let user_id = <c:out value="${user.id}"/>;
             $.ajax({
                 type: 'GET',
-                data: {'viewdone': viewdone},
+                data: {
+                    'viewdone': viewdone,
+                    'userid': user_id
+                },
                 url: 'http://localhost:8080/job4j_todo/todo',
                 dataType: 'json'
             }).done(function (items) {
@@ -117,6 +126,21 @@
 </head>
 <body>
 <div class="container">
+    <div class="row">
+        <ul class="nav">
+            <c:if test="${user != null}">
+                <li class="nav-item">
+                    <a class="nav-link" href="<%=request.getContextPath()%>/login.jsp"><c:out value="${user.name}"/> |
+                        Выйти</a>
+                </li>
+            </c:if>
+            <c:if test="${user == null}">
+                <li class="nav-item">
+                    <a class="nav-link" href="<%=request.getContextPath()%>/login.jsp">Войти</a>
+                </li>
+            </c:if>
+        </ul>
+    </div>
     <div class="form-group">
         <label for="viewdone">Показывать все</label>
         <p><input type="checkbox" name="viewdone" id="viewdone" onchange="getItems()"></p>
