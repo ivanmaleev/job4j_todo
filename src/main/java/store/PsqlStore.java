@@ -3,6 +3,7 @@ package store;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -13,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Function;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -64,40 +66,47 @@ public class PsqlStore implements Store {
         return Lazy.INST;
     }
 
+    private <T> T query(final Function<Session, T> command) {
+        final Session session = sf.openSession();
+        final Transaction transaction = session.beginTransaction();
+        try {
+            T rsl = command.apply(session);
+            transaction.commit();
+            return rsl;
+        } catch (final Exception e) {
+            session.getTransaction().rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
+    }
+
     @Override
     public List<Item> findAllItems(boolean all) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        Query query = null;
-        if (all) {
-            query = session.createQuery("from Item order by id");
-        } else {
-            query = session.createQuery("from Item where done = false order by id");
-        }
-        List items = query.list();
-        session.getTransaction().commit();
-        session.close();
-        return items;
+        return query(session -> {
+            if (all) {
+                return session.createQuery("from Item order by id").list();
+            } else {
+                return session.createQuery("from Item where done = false order by id").list();
+            }
+        });
     }
 
     @Override
     public Item saveItem(Item item) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        session.save(item);
-        session.getTransaction().commit();
-        session.close();
-        return item;
+        return query(session -> {
+            session.save(item);
+            return item;
+        });
     }
 
     @Override
     public void setDone(int id) {
-        Session session = sf.openSession();
-        session.beginTransaction();
-        Query query = session.createQuery("update Item set done = true where id =: id");
-        query.setParameter("id", id);
-        query.executeUpdate();
-        session.getTransaction().commit();
-        session.close();
+        query(session -> {
+            Query query = session.createQuery("update Item set done = true where id =: id");
+            query.setParameter("id", id);
+            query.executeUpdate();
+            return null;
+        });
     }
 }
