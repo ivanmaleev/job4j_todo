@@ -4,4 +4,20 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+  <servlet>
+    <servlet-name>TodoServlet</servlet-name>
+    <servlet-class>ru.job4j.todo.servlet.TodoServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>DoneServlet</servlet-name>
+    <servlet-class>ru.job4j.todo.servlet.DoneServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TodoServlet</servlet-name>
+    <url-pattern>/todo</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DoneServlet</servlet-name>
+    <url-pattern>/done</url-pattern>
+  </servlet-mapping>
 </web-app>
