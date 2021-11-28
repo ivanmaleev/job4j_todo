@@ -86,11 +86,11 @@ public class PsqlStore implements Store {
     public List<Item> findAllItems(boolean all, int userid) {
         return query(session -> {
             if (all) {
-                Query query = session.createQuery("from Item where user = : user order by id");
+                Query<Item> query = session.createQuery("from Item where user = : user order by id");
                 query.setParameter("user", new User(userid));
                 return query.list();
             } else {
-                Query query = session.createQuery("from Item where user = : user and done = false order by id");
+                Query<Item> query = session.createQuery("from Item where user = : user and done = false order by id");
                 query.setParameter("user", new User(userid));
                 return query.list();
             }
@@ -108,7 +108,7 @@ public class PsqlStore implements Store {
     @Override
     public void setDone(int id) {
         query(session -> {
-            Query query = session.createQuery("update Item set done = true where id =: id");
+            Query<Item> query = session.createQuery("update Item set done = true where id =: id");
             query.setParameter("id", id);
             query.executeUpdate();
             return null;
@@ -125,11 +125,10 @@ public class PsqlStore implements Store {
 
     @Override
     public User findUserByEmail(String email) {
-        List<User> users = query(session -> {
-            Query query = session.createQuery("from User where email = : email");
+        return query(session -> {
+            Query<User> query = session.createQuery("from User where email = : email");
             query.setParameter("email", email);
-            return query.list();
+            return query.uniqueResult();
         });
-        return (users.size() == 0 ? null : users.get(0));
     }
 }
