@@ -41,10 +41,11 @@ public class TodoServlet extends HttpServlet {
             throws ServletException, IOException {
         String description = req.getParameter("description");
         String userid = req.getParameter("userid");
+        String[] cidsStr = req.getParameterMap().get("cIds[]");
         Item item = new Item();
         item.setDescription(description);
         item.setUser(new User(Integer.parseInt(userid)));
-        PsqlStore.instOf().saveItem(item);
+        PsqlStore.instOf().saveItem(item, cidsStr);
         doGet(req, resp);
     }
 }

@@ -8,6 +8,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.Query;
+import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Item;
 
 import java.io.BufferedReader;
@@ -86,11 +87,13 @@ public class PsqlStore implements Store {
     public List<Item> findAllItems(boolean all, int userid) {
         return query(session -> {
             if (all) {
-                Query<Item> query = session.createQuery("from Item where user = : user order by id");
+                Query<Item> query = session.createQuery(
+                        "from Item where user = : user order by id");
                 query.setParameter("user", new User(userid));
                 return query.list();
             } else {
-                Query<Item> query = session.createQuery("from Item where user = : user and done = false order by id");
+                Query<Item> query = session.createQuery(
+                        "from Item where user = : user and done = false order by id");
                 query.setParameter("user", new User(userid));
                 return query.list();
             }
@@ -98,8 +101,12 @@ public class PsqlStore implements Store {
     }
 
     @Override
-    public Item saveItem(Item item) {
+    public Item saveItem(Item item, String[] cids) {
         return query(session -> {
+            for (int i = 0; i < cids.length; i++) {
+                Category category = session.find(Category.class, Integer.parseInt(cids[i]));
+                item.addCategory(category);
+            }
             session.save(item);
             return item;
         });
@@ -108,7 +115,8 @@ public class PsqlStore implements Store {
     @Override
     public void setDone(int id) {
         query(session -> {
-            Query<Item> query = session.createQuery("update Item set done = true where id =: id");
+            Query<Item> query = session.createQuery(
+                    "update Item set done = true where id =: id");
             query.setParameter("id", id);
             query.executeUpdate();
             return null;
@@ -126,9 +134,17 @@ public class PsqlStore implements Store {
     @Override
     public User findUserByEmail(String email) {
         return query(session -> {
-            Query<User> query = session.createQuery("from User where email = : email");
+            Query<User> query = session.createQuery(
+                    "from User where email = : email");
             query.setParameter("email", email);
             return query.uniqueResult();
         });
+    }
+
+    @Override
+    public List<Category> findAllCategories() {
+        return query(session ->
+                session.createQuery(
+                        "from Category").list());
     }
 }

@@ -3,6 +3,9 @@ package ru.job4j.todo.model;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "item")
@@ -12,6 +15,7 @@ public class Item {
     private Timestamp created;
     private boolean done;
     private User user;
+    private List<Category> categories = new ArrayList<>();
 
     public Item(int id, String description, boolean done) {
         this.id = id;
@@ -20,7 +24,7 @@ public class Item {
         this.done = done;
     }
 
-    public Item(int id, String description, Timestamp created,  boolean done, User user) {
+    public Item(int id, String description, Timestamp created, boolean done, User user) {
         this.id = id;
         this.description = description;
         this.created = created;
@@ -74,5 +78,35 @@ public class Item {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+
+    public void addCategory(Category categories) {
+        this.categories.add(categories);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Item item = (Item) o;
+        return id == item.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

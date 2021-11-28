@@ -63,9 +63,16 @@
         <p><input type="checkbox" name="viewdone" id="viewdone" onchange="getItems(<c:out value="${user.id}"/>)"></p>
         <label for="description">Описание</label>
         <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+        <label class="col-form-label col-sm-3" for="cIds" style="font-weight: 900">Категории</label>
+        <div class="col-sm-5">
+            <select class="form-control" name="cIds" id="cIds" multiple>
+                <c:forEach items="${allCategories}" var="category">
+                    <option value="${category.id}">${category.name}</option>
+                </c:forEach>
+            </select>
+        </div>
     </div>
-    <button type="button" class="btn btn-default" onclick="addItem(<c:out value="${user.id}"/>)">Добавить задачу
-    </button>
+    <button type="button" class="btn btn-default" onclick="addItem(<c:out value="${user.id}"/>)">Добавить задачу</button>
     <div class="row pt-3">
         <table class="table" id="itemstable">
             <thead>
