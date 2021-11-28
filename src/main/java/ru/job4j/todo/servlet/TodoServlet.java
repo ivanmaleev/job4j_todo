@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+@WebServlet(urlPatterns = "/todo")
 public class TodoServlet extends HttpServlet {
 
     private static final Gson GSON = new GsonBuilder().create();
@@ -24,10 +26,7 @@ public class TodoServlet extends HttpServlet {
             throws ServletException, IOException {
         String viewdone = req.getParameter("viewdone");
         String userid = req.getParameter("userid");
-        boolean all = false;
-        if ("true".equals(viewdone)) {
-            all = true;
-        }
+        boolean all = "true".equals(viewdone);
         List<Item> items = PsqlStore.instOf().findAllItems(all, Integer.parseInt(userid));
         resp.setContentType("application/json; charset=utf-8");
         OutputStream output = resp.getOutputStream();
@@ -42,12 +41,10 @@ public class TodoServlet extends HttpServlet {
             throws ServletException, IOException {
         String description = req.getParameter("description");
         String userid = req.getParameter("userid");
-        if (!"".equals(description)) {
-            Item item = new Item();
-            item.setDescription(description);
-            item.setUser(new User(Integer.parseInt(userid)));
-            PsqlStore.instOf().saveItem(item);
-        }
+        Item item = new Item();
+        item.setDescription(description);
+        item.setUser(new User(Integer.parseInt(userid)));
+        PsqlStore.instOf().saveItem(item);
         doGet(req, resp);
     }
 }

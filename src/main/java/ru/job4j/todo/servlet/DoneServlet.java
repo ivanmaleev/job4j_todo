@@ -3,19 +3,20 @@ package ru.job4j.todo.servlet;
 import store.PsqlStore;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@WebServlet(urlPatterns = "/done")
 public class DoneServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        String id = req.getParameter("id");
-        if (!"".equals(id)) {
-            PsqlStore.instOf().setDone(Integer.parseInt(id));
-        }
+        String idstr = req.getParameter("id");
+        int id = Integer.parseInt(idstr);
+        PsqlStore.instOf().setDone(id);
     }
 }

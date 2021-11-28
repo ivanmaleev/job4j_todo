@@ -1,10 +1,12 @@
 package ru.job4j.todo.filter;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@WebFilter(urlPatterns = "/*")
 public class AuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest sreq, ServletResponse sresp, FilterChain chain) throws IOException, ServletException {
