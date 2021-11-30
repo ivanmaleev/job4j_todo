@@ -88,12 +88,16 @@ public class PsqlStore implements Store {
         return query(session -> {
             if (all) {
                 Query<Item> query = session.createQuery(
-                        "from Item where user = : user order by id");
+                        "select distinct it from  Item as it "
+                                + "left join fetch it.categories "
+                                + "where it.user = : user order by it.id");
                 query.setParameter("user", new User(userid));
                 return query.list();
             } else {
                 Query<Item> query = session.createQuery(
-                        "from Item where user = : user and done = false order by id");
+                        "select distinct it from  Item as it "
+                                + "left join fetch it.categories "
+                                + "where it.done = false and it.user = : user order by it.id");
                 query.setParameter("user", new User(userid));
                 return query.list();
             }
@@ -103,8 +107,8 @@ public class PsqlStore implements Store {
     @Override
     public Item saveItem(Item item, String[] cids) {
         return query(session -> {
-            for (int i = 0; i < cids.length; i++) {
-                Category category = session.find(Category.class, Integer.parseInt(cids[i]));
+            for (String cid : cids) {
+                Category category = session.find(Category.class, Integer.parseInt(cid));
                 item.addCategory(category);
             }
             session.save(item);

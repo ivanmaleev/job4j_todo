@@ -10,11 +10,16 @@ import java.util.Objects;
 @Entity
 @Table(name = "item")
 public class Item {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String description;
     private Timestamp created;
     private boolean done;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Category> categories = new ArrayList<>();
 
     public Item(int id, String description, boolean done) {
@@ -36,8 +41,6 @@ public class Item {
         created = Timestamp.from(Instant.now());
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int getId() {
         return id;
     }
@@ -70,8 +73,6 @@ public class Item {
         this.done = done;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
     public User getUser() {
         return user;
     }
@@ -80,7 +81,6 @@ public class Item {
         this.user = user;
     }
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     public List<Category> getCategories() {
         return categories;
     }
