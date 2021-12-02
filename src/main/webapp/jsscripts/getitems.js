@@ -16,14 +16,25 @@ function getItems(user_id) {
         for (var item of items) {
             var tr = document.createElement('tr');
             var th = document.createElement('th');
-            var td = document.createElement('td');
             th.setAttribute('scope', 'row');
             let text = document.createTextNode(item.id);
             th.append(text);
             tr.append(th);
+
+            var td = document.createElement('td');
             text = document.createTextNode(item.description);
             td.append(text);
             tr.appendChild(td);
+
+            td = document.createElement('td');
+            var cattext = '';
+            item.categories.forEach(function (cat) {
+                cattext = (cattext == '' ? cat.name : cattext + ',' + cat.name);
+            })
+            text = document.createTextNode(cattext);
+            td.append(text);
+            tr.appendChild(td);
+
             td = document.createElement('td');
             text = document.createTextNode(item.created);
             td.append(text);

@@ -79,6 +79,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Описание</th>
+                <th scope="col">Категории</th>
                 <th scope="col">Создано</th>
                 <th scope="col">Выполнено</th>
             </tr>
